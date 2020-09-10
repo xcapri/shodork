@@ -6,7 +6,7 @@ from pyfiglet import Figlet
 
 custom_fig = Figlet(font='graffiti')
 
-apikey = 'XXXXXXXXXXXXXXXXXXXXXXX' #set ur api
+apikey = 'XXXXXXXXXXXXXXXXXXXXXXXX' #set ur api
 page = '100' #default in shodan 
 print(custom_fig.renderText('SHODORK'))
 print('\t Shodan Dork asn Generator | By https://github.com/xcapri/\n')
@@ -24,24 +24,44 @@ def get_asn(ip):
 		save = open('asn.txt', 'a')
 		save.write(asn+'\n')
 		save.close()
-
+	else:
+		print(ips+ 'Error')
 	return get_asn
 def get_ip(asn):
 
-    
-	for pa in range(100):
-		ipp = 'https://api.shodan.io/shodan/host/search?key='+ apikey +'&query=asn:'+ asn +'&page='+ str(pa) + '&facets=facets'
-		ipl = urllib.urlopen(ipp)
-		lip = json.loads(ipl.read())
+	hi = 'https://api.shodan.io/shodan/host/search?key='+ apikey +'&query=asn:'+ asn +'&facets=facets'
+	hii = urllib.urlopen(hi)
+	hiii = json.loads(hii.read())
+	if hiii['total'] <= 10000:
+		pages = hiii['total']
+		for pgs in range(pages):
+			ipp = 'https://api.shodan.io/shodan/host/search?key='+ apikey +'&query=asn:'+ asn +'&page='+ str(pgs) + '&facets=facets'
+			ipl = urllib.urlopen(ipp)
+			lip = json.loads(ipl.read())
+			if 'matches' in lip:
+				for pip in range(len(lip['matches'])):
+					print((lip['matches'][pip]['ip_str']))
+					save = open('randomip.txt', 'a')
+					save.write((lip['matches'][pip]['ip_str'])+'\n')
+					save.close()
+			elif 'error' in lip:
+					print((asn)+ '| Error')
+	elif hiii['total'] >= 10000:
+
+		for pa in range(100):
+		    ipp = 'https://api.shodan.io/shodan/host/search?key='+ apikey +'&query=asn:'+ asn +'&page='+ str(pa) + '&facets=facets'
+		    ipl = urllib.urlopen(ipp)
+		    lip = json.loads(ipl.read())
 		if 'matches' in lip:
 			for pip in range(len(lip['matches'])):
-			 print(lip['matches'][pip]['ip_str'])
+			 print((lip['matches'][pip]['ip_str']))
 
 			save = open('randomip.txt', 'a')
 			save.write((lip['matches'][pip]['ip_str'])+'\n')
 			save.close()
 		elif 'error' in lip:
-			print((lip['matches'][pip]['ip_str'])+ ' Error')
+			print((asn)+ '| Error')
+	
 		
 
 
